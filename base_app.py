@@ -31,6 +31,7 @@ all_stop = set(stopwords.words('english'))
 def tweet_processing(tweet):
     def clean_tweet(tweet):
         tweet_blob = TextBlob(tweet)
+        words = tweet_blob.words if isinstance(tweet_blob.words, list) else [tweet_blob.words]
         return ' '.join(tweet_blob.words)
 
     new_tweet = clean_tweet(tweet)
@@ -92,7 +93,6 @@ df_test['sentiment'] = y_pred.tolist()
 
 #subset columns for output format
 df_final_sub = df_test[['tweetid', 'sentiment']]
-
 #Export prediction data to .csv for Kaggle submission
 df_final_sub.to_csv('final_prediction.csv', index=False)
 
