@@ -8,6 +8,9 @@ from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from wordcloud import WordCloud
 from sklearn.feature_extraction.text import TfidfTransformer, CountVectorizer
+import matplotlib.pyplot as plt
+from sklearn.metrics import accuracy_score, classification_report
+
 import re 
 
 
@@ -80,7 +83,7 @@ best_pipe = Pipeline([
     ('tfidf', TfidfTransformer()), #weight the classes
     ('classifier', LinearSVC()),
 ])
-best_pipe.fit(X, y)
+best_pipe.fit(X,_train y_train)
 
 #make predictions from from fitted model
 y_pred = best_pipe.predict(testX)
@@ -94,6 +97,11 @@ df_final_sub = df_test[['tweetid', 'sentiment']]
 #Export prediction data to .csv for Kaggle submission
 df_final_sub.to_csv('final_prediction.csv', index=False)
 
+def analyze_sentiment(cleaned_text):
+    prediction = best_pipe.predict([cleaned_text])[0]
+    return prediction
+
+
 # Function to generate word cloud
 def plot_word_cloud(text, title):
     wordcloud = WordCloud(background_color='white', max_words=200, max_font_size=100, random_state=42, width=800, height=400)
@@ -106,6 +114,7 @@ def plot_word_cloud(text, title):
     plt.tight_layout()
 
 # Function to plot sentiment distribution
+st.set_option('deprecation.showPyplotGlobalUse', False)
 def plot_sentiment_distribution(sentiment_column):
     fig, ax = plt.subplots(figsize=(5, 5))
     plt.hist(sentiment_column, bins=[-1, 0, 1, 2, 3], align='left', rwidth=0.8, color='skyblue', edgecolor='black')
