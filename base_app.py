@@ -1,83 +1,63 @@
-"""
+# sentiment_app.py
 
-    Simple Streamlit webserver application for serving developed classification
-	models.
-
-    Author: Explore Data Science Academy.
-
-    Note:
-    ---------------------------------------------------------------------
-    Please follow the instructions provided within the README.md file
-    located within this directory for guidance on how to use this script
-    correctly.
-    ---------------------------------------------------------------------
-
-    Description: This file is used to launch a minimal streamlit web
-	application. You are expected to extend the functionality of this script
-	as part of your predict project.
-
-	For further help with the Streamlit framework, see:
-
-	https://docs.streamlit.io/en/latest/
-
-"""
-# Streamlit dependencies
 import streamlit as st
-import joblib,os
-
-# Data dependencies
 import pandas as pd
+from textblob import TextBlob  # Assuming you'll use TextBlob for sentiment analysis
 
-# Vectorizer
-news_vectorizer = open("resources/tfidfvect.pkl","rb")
-tweet_cv = joblib.load(news_vectorizer) # loading your vectorizer from the pkl file
+# Function to analyze sentiments using TextBlob
+def analyze_sentiment(text):
+    analysis = TextBlob(text)
+    return analysis.sentiment.polarity
 
-# Load your raw data
-raw = pd.read_csv("resources/train.csv")
-
-# The main function where we will build the actual app
+# Main function to load data and create the app
 def main():
-	"""Tweet Classifier App with Streamlit """
+    st.title("Sentiment Analyser 🔥")
 
-	# Creates a main title and subheader on your page -
-	# these are static across all pages
-	st.title("Tweet Classifer")
-	st.subheader("Climate change tweet classification")
+    # Add a sidebar with options
+    st.sidebar.title("Options")
+    selected_option = st.sidebar.selectbox("Select Option", ["Sentiment Predictions", "Information", "FAQs", "App Reviews"])
 
-	# Creating sidebar with selection box -
-	# you can create multiple pages this way
-	options = ["Prediction", "Information"]
-	selection = st.sidebar.selectbox("Choose Option", options)
+    if selected_option == "Sentiment Predictions":
+        # Upload CSV file
+        uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
 
-	# Building out the "Information" page
-	if selection == "Information":
-		st.info("General Information")
-		# You can read a markdown file from supporting resources folder
-		st.markdown("Some information here")
+        if uploaded_file is not None:
+            # Read data from CSV
+            df = pd.read_csv(uploaded_file)
 
-		st.subheader("Raw Twitter data and label")
-		if st.checkbox('Show raw data'): # data is hidden if box is unchecked
-			st.write(raw[['sentiment', 'message']]) # will write the df to the page
+            # Show the uploaded data
+            st.subheader("Uploaded Data")
+            st.dataframe(df)
 
-	# Building out the predication page
-	if selection == "Prediction":
-		st.info("Prediction with ML Models")
-		# Creating a text box for user input
-		tweet_text = st.text_area("Enter Text","Type Here")
+            # Analyze sentiments and add a new column to the DataFrame
+            df['Sentiment'] = df['Text'].apply(analyze_sentiment)
 
-		if st.button("Classify"):
-			# Transforming user input with vectorizer
-			vect_text = tweet_cv.transform([tweet_text]).toarray()
-			# Load your .pkl file with the model of your choice + make predictions
-			# Try loading in multiple models to give the user a choice
-			predictor = joblib.load(open(os.path.join("resources/Logistic_regression.pkl"),"rb"))
-			prediction = predictor.predict(vect_text)
+            # Show the data with sentiment predictions
+            st.subheader("Data with Sentiment Predictions")
+            st.dataframe(df)
 
-			# When model has successfully run, will print prediction
-			# You can use a dictionary or similar structure to make this output
-			# more human interpretable.
-			st.success("Text Categorized as: {}".format(prediction))
+    elif selected_option == "Information":
+        # Provide information about the app
+        st.subheader("Information")
+        st.write("This tool fetches the tweets from the Twitter site & performs the following tasks:")
+        st.write("1. Converts it into a DataFrame")
+        st.write("2. Cleans the text")
+        st.write("3. Analyzes Subjectivity of tweets and adds an additional column for it")
+        st.write("4. Analyzes Polarity of tweets and adds an additional column for it")
+        st.write("5. Analyzes Sentiments of tweets and adds an additional column for it")
 
-# Required to let Streamlit instantiate our web app.  
-if __name__ == '__main__':
-	main()
+    elif selected_option == "FAQs":
+        # Display frequently asked questions
+        st.subheader("Frequently Asked Questions")
+        st.write("1. **How to upload a CSV file?**")
+        st.write("   - Use the 'Upload a CSV file' option in the 'Sentiment Predictions' section.")
+        st.write("2. **What does the app do?**")
+        st.write("   - The app analyzes sentiments from the text data in the uploaded CSV file.")
+
+    elif selected_option == "App Reviews":
+        # Provide functionality for analyzing app reviews
+        st.subheader("App Reviews")
+        st.write("Add your functionality for analyzing app reviews here.")
+
+if __name__ == "__main__":
+    main()
