@@ -97,6 +97,8 @@ df_final_sub = df_test[['tweetid', 'sentiment']]
 df_final_sub.to_csv('final_prediction.csv', index=False)
 
 def analyze_sentiment(cleaned_text):
+    if isinstance(cleaned_text,list):
+        cleaned_text = ' '.join(cleaned_text)
     prediction = best_pipe.predict([cleaned_text])[0]
     return prediction
 
