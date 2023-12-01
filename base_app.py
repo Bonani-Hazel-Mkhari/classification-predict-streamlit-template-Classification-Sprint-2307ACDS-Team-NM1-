@@ -114,17 +114,7 @@ def plot_word_cloud(text, title):
     plt.axis('off')
     plt.tight_layout()
 
-# Function to plot sentiment distribution
-st.set_option('deprecation.showPyplotGlobalUse', False)
-def plot_sentiment_distribution(sentiment_column):
-    fig, ax = plt.subplots(figsize=(5, 5))
-    plt.hist(sentiment_column, bins=[-1, 0, 1, 2, 3], align='left', rwidth=0.8, color='skyblue', edgecolor='black')
-    plt.title('Class Distribution', fontweight="bold")
-    plt.xlabel('Sentiment')
-    plt.ylabel('Count')
-    plt.xticks(ticks=[-1, 0, 1, 2], labels=['Anti(-1)', 'Neutral(0)', 'Pro(1)', 'News(2)'])
-    st.pyplot(fig)
-
+# Main function to load data and create the app
 # Main function to load data and create the app
 def main():
     st.title("Sentiment Analyser 🔥")
@@ -161,9 +151,27 @@ def main():
             st.subheader("Data with Sentiment Predictions")
             st.dataframe(df)
 
-            # Plot sentiment distribution
-            st.subheader("Sentiment Distribution")
-            plot_sentiment_distribution(df['Predicted_Sentiment'])
+            if st.checkbox("Plot Most Prevalent Sentiment"):
+                st.set_option('deprecation.showPyplotGlobalUse', False)
+                def plot_sentiment_distribution(sentiment_column):
+                    fig, ax = plt.subplots(figsize=(5, 5))
+                    plt.hist(sentiment_column, bins=[-1, 0, 1, 2, 3], align='left', rwidth=0.8, color='skyblue', edgecolor='black')
+                    plt.title('Class Distribution', fontweight="bold")
+                    plt.xlabel('Sentiment')
+                    plt.ylabel('Count')
+                    plt.xticks(ticks=[-1, 0, 1, 2], labels=['Anti(-1)', 'Neutral(0)', 'Pro(1)', 'News(2)'])
+                    st.pyplot(fig)
+
+                # Function to plot sentiment distribution
+                st.set_option('deprecation.showPyplotGlobalUse', False)
+                plot_sentiment_distribution(df['Predicted_Sentiment'])
+
+        # Option to generate word cloud for different sentiments
+        if st.checkbox("Generate Word Clouds"):
+            plot_word_cloud(df.loc[df['Predicted_Sentiment'] == -1]['Cleaned_Text'], title="Don't believe in climate change")
+            plot_word_cloud(df.loc[df['Predicted_Sentiment'] == 0]['Cleaned_Text'], title="Neutral")
+            plot_word_cloud(df.loc[df['Predicted_Sentiment'] == 1]['Cleaned_Text'], title="Climate change believers")
+            st.pyplot()
 
     elif selected_option == "FAQs":
         # Display frequently asked questions
@@ -176,24 +184,9 @@ def main():
     elif selected_option == "App Reviews":
         # Provide functionality for analyzing app reviews
         st.subheader("App Reviews")
-        st.write("Add your functionality for analyzing app reviews here.")
 
-        # Option to plot the most prevalent sentiment
-        if st.checkbox("Plot Most Prevalent Sentiment"):
-            fig, ax = plt.subplots(figsize=(5, 5))
-            plt.hist(df['Predicted_Sentiment'])
-            plt.title('Sentiment distribution', fontweight="bold")
-            plt.xlabel('Sentiment')
-            plt.ylabel('Count')
-            plt.xticks(ticks=[-1, 0, 1, 2], labels=['Anti(-1)', 'Neutral(0)', 'Pro(1)', 'News(2)'])
-            st.pyplot(fig)
-
-        # Option to generate word cloud for different sentiments
-        if st.checkbox("Generate Word Clouds"):
-            plot_word_cloud(df.loc[df['Predicted_Sentiment'] == -1]['Cleaned_Text'], title="Don't believe in climate change")
-            plot_word_cloud(df.loc[df['Predicted_Sentiment'] == 0]['Cleaned_Text'], title="Neutral")
-            plot_word_cloud(df.loc[df['Predicted_Sentiment'] == 1]['Cleaned_Text'], title="Climate change believers")
-            st.pyplot()
+        # Add a text box for user input
+        user_review = st.text_area("Enter your review here:", "")
 
 if __name__ == "__main__":
     main()
