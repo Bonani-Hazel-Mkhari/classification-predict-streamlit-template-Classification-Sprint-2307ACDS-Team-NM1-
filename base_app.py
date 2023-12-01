@@ -28,12 +28,12 @@ df_test = pd.read_csv("test_with_no_labels.csv")
 
 # Function to clean and preprocess tweets
 all_stop = set(stopwords.words('english'))
-def tweet_processing(message):
-    def clean_tweet(message):
-        tweet_blob = TextBlob(message)
+def tweet_processing(tweet):
+    def clean_tweet(tweet):
+        tweet_blob = TextBlob(tweet)
         return ' '.join(tweet_blob.words)
 
-    new_tweet = clean_tweet(message)
+    new_tweet = clean_tweet(tweet)
 
     def clean_stopwords(message):
         tweet_tokens = word_tokenize(message)
@@ -82,7 +82,7 @@ best_pipe = Pipeline([
     ('tfidf', TfidfTransformer()), #weight the classes
     ('classifier', LinearSVC()),
 ])
-best_pipe.fit(X,_train y_train)
+best_pipe.fit(X_train, y_train)
 
 #make predictions from from fitted model
 y_pred = best_pipe.predict(testX)
