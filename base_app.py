@@ -1,4 +1,24 @@
-# sentiment_app.py
+"""
+Simple Streamlit webserver application for serving developed classification models.
+
+Author: Explore Data Science Academy.
+
+Note:
+---------------------------------------------------------------------
+Please follow the instructions provided within the README.md file
+located within this directory for guidance on how to use this script
+correctly.
+---------------------------------------------------------------------
+
+Description: This file is used to launch a minimal streamlit web
+application. You are expected to extend the functionality of this script
+as part of your predict project.
+
+For further help with the Streamlit framework, see:
+
+https://docs.streamlit.io/en/latest/
+"""
+# Streamlit dependencies
 import streamlit as st
 import pandas as pd
 from textblob import TextBlob
@@ -106,13 +126,17 @@ def analyze_sentiment(cleaned_text):
 news_vectorizer = open("resources/tfidfvect.pkl","rb")
 tweet_cv = joblib.load(news_vectorizer) # loading your vectorizer from the pkl file
 
-count_vectorizer = joblib.load("resources/count_vectorizer_model.pkl", "rb")
-#tweet_processor = joblib.load(count_vectorizer)
+#pipeline_path = os.path.join("resources", "Linearsvc_pipeline.pkl")
+#pipeline = joblib.load(open(pipeline_path, "rb"))
+
 # Load your raw data
 raw = pd.read_csv("resources/train.csv")
 # Main function to load data and create the app
 def main():
-    st.title("Sentiment Analyser 🔥")
+    st.title("DisCava 🔥")
+    st.subheader("🚀 Welcome to the Sentiment Prediction Galaxy! 🌟")
+    st.markdown("Explore the vast universe of machine learning models designed to decode sentiments with precision. From starry-eyed classifiers to cosmic regressors, embark on a journey to unveil the secrets of sentiment analysis! 🌌✨")
+    
 
     # Add a sidebar with options
     st.sidebar.title("Options")
@@ -197,64 +221,39 @@ def main():
         user_review = st.text_area("Enter your review here:", "")
     
     st.sidebar.title("Models")
-    selected_model = st.sidebar.selectbox("Select Models", ["Information", "Logistic Regression", "Linear SVC", "Nearest Neighbour"])
+    selected_model = st.sidebar.selectbox("Select Models", ["Information", "Prediction"])
 
-    # Building out the "Information" page
-    if selected_model == "Information":
-        st.subheader("🚀 Welcome to the Sentiment Prediction Galaxy! 🌟")
-        # You can read a markdown file from supporting resources folder
-        st.markdown("Explore the vast universe of machine learning models designed to decode sentiments with precision. From starry-eyed classifiers to cosmic regressors, embark on a journey to unveil the secrets of sentiment analysis! 🌌✨")
+    # Building out the predication page
+    if selected_model == "Prediction":
+        st.subheader("🚀 Explore Various predictive model 🌟")
+        st.markdown(" Enter you text>> choose model>> Classify!!")
+    
 
-        #st.subheader("Raw Twitter data and label")
-        #if st.checkbox('Show raw data'): # data is hidden if box is unchecked
-            #st.write(raw[['sentiment', 'message']]) # will write the df to the page
-
-    # Building out the prediction page
-    elif selected_model == "Logistic Regression":
-        st.info("Prediction with ML Models")
         # Creating a text box for user input
         tweet_text = st.text_area("Enter Text", "Type Here")
+        option = st.selectbox(
+            'Select a model to use',
+            ['Linear SVC', 'Logistic Regression', 'Nearest Neighbors']
+        )
 
         if st.button("Classify"):
-            # Transforming user input with vectorizer
             vect_text = tweet_cv.transform([tweet_text]).toarray()
+
             # Load your .pkl file with the model of your choice + make predictions
             # Try loading in multiple models to give the user a choice
-            predictor = joblib.load(open(os.path.join("resources/Logistic_regression.pkl"), "rb"))
+            predictor = joblib.load(open(os.path.join("resources/Linearsvc_pipeline.pkl"), "rb"))
             prediction = predictor.predict(vect_text)
 
-            # When the model has successfully run, will print prediction
-            # You can use a dictionary or similar structure to make this output
+            output_text = {
+                '0': 'Neutral',
+                '-1': 'Anti climate change',
+                '1': 'Pro Climate change',
+                '2': 'News'
+            }
             # more human interpretable.
-            st.success("Text Categorized as: {}".format(prediction))
+            st.success("Tweet categorized by {} model as: {}".format(option, output_text[str(prediction[0])]))
 
-    # Building out the prediction page
-    elif selected_model == "Linear SVC":
-        st.info("Prediction with ML Models")
-        # Creating a text box for user input
-        tweet_text = st.text_area("Enter Text", "Type Here")
 
-        if st.button("Classify"):
-            # Transforming user input with vectorizer
-            vect_text = tweet_cv.transform([tweet_text]).toarray()
-            # Load your .pkl file with the model of your choice + make predictions
-            # Try loading in multiple models to give the user a choice
-            predictor = joblib.load(open(os.path.join("resources/linear_svc_model.pkl"), "rb"))
-            prediction = predictor.predict(vect_text)
-
-            st.success("Text Categorized as: {}".format(prediction))
-
-    elif selected_model == "Nearest Neighbour":
-        st.info("Prediction with ML Models")
-        # Creating a text box for user input
-        tweet_text = st.text_area("Enter Text", "Type Here")
-
-        if st.button("Classify"):
-            # Transforming user input with vectorizer
-            vect_text = tweet_cv.transform([tweet_text]).toarray()
-            # Load your .pkl file with the model of your choice + make predictions
-            # Try loading in multiple models to give the user a choice
-            predictor = joblib.load(open(os.path.join("resources/best_model.pkl"), "rb"))
-
-if __name__ == "__main__":
+# Required to let Streamlit instantiate our web app.
+if __name__ == '__main__':
     main()
