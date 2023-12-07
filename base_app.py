@@ -107,7 +107,7 @@ news_vectorizer = open("resources/tfidfvect.pkl","rb")
 tweet_cv = joblib.load(news_vectorizer) # loading your vectorizer from the pkl file
 
 count_vectorizer = joblib.load("resources/count_vectorizer_model.pkl", "rb")
-tweet_processor = joblib.load(count_vectorizer)
+#tweet_processor = joblib.load(count_vectorizer)
 # Load your raw data
 raw = pd.read_csv("resources/train.csv")
 # Main function to load data and create the app
@@ -236,7 +236,7 @@ def main():
 
         if st.button("Classify"):
             # Transforming user input with vectorizer
-            vect_text = tweet_processor.transform([tweet_text]).toarray()
+            vect_text = tweet_cv.transform([tweet_text]).toarray()
             # Load your .pkl file with the model of your choice + make predictions
             # Try loading in multiple models to give the user a choice
             predictor = joblib.load(open(os.path.join("resources/linear_svc_model.pkl"), "rb"))
