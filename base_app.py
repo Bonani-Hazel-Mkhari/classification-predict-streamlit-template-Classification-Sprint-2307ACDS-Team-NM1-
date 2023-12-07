@@ -10,7 +10,8 @@ from wordcloud import WordCloud
 from sklearn.feature_extraction.text import TfidfTransformer, CountVectorizer
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, classification_report
-
+import joblib,os
+import joblib
 import re 
 
 #modelling imports:
@@ -102,19 +103,13 @@ def analyze_sentiment(cleaned_text):
     prediction = best_pipe.predict([cleaned_text])[0]
     return prediction
 
+news_vectorizer = open("resources/tfidfvect.pkl","rb")
+tweet_cv = joblib.load(news_vectorizer) # loading your vectorizer from the pkl file
 
-# Function to generate word cloud
-def plot_word_cloud(text, title):
-    wordcloud = WordCloud(background_color='white', max_words=200, max_font_size=100, random_state=42, width=800, height=400)
-    wordcloud.generate(str(text))
-
-    plt.figure(figsize=(24, 16))
-    plt.imshow(wordcloud)
-    plt.title(title, fontdict={'size': 40, 'verticalalignment': 'bottom'})
-    plt.axis('off')
-    plt.tight_layout()
-
-# Main function to load data and create the app
+count_vectorizer = joblib.load("resources/count_vectorizer_model.pkl", "rb")
+tweet_processor = joblib.load(count_vectorizer)
+# Load your raw data
+raw = pd.read_csv("resources/train.csv")
 # Main function to load data and create the app
 def main():
     st.title("Sentiment Analyser 🔥")
@@ -126,12 +121,7 @@ def main():
     if selected_option == "About":
         # Provide information about the app
         st.subheader("About")
-        st.write("This tool fetches the tweets from the Twitter site & performs the following tasks:")
-        st.write("1. Converts it into a DataFrame")
-        st.write("2. Cleans the text")
-        st.write("3. Analyzes Subjectivity of tweets and adds an additional column for it")
-        st.write("4. Analyzes Polarity of tweets and adds an additional column for it")
-        st.write("5. Analyzes Sentiments of tweets and adds an additional column for it")
+        st.write("This tool fetches the tweets from your file & prepocess your dataset and Analyzes Subjectivity and Polarity of tweets and predicts sentiments of tweets ")
 
     elif selected_option == "Sentiment Predictions":
         # Upload CSV file
@@ -153,6 +143,7 @@ def main():
 
             if st.checkbox("Plot Most Prevalent Sentiment"):
                 st.set_option('deprecation.showPyplotGlobalUse', False)
+
                 def plot_sentiment_distribution(sentiment_column):
                     fig, ax = plt.subplots(figsize=(5, 5))
                     plt.hist(sentiment_column, bins=[-1, 0, 1, 2, 3], align='left', rwidth=0.8, color='skyblue', edgecolor='black')
@@ -168,10 +159,27 @@ def main():
 
         # Option to generate word cloud for different sentiments
         if st.checkbox("Generate Word Clouds"):
+            # Function to generate word cloud
+            def plot_word_cloud(text, title):
+                wordcloud = WordCloud(background_color='white', max_words=200, max_font_size=100, random_state=42, width=800, height=400) 
+                wordcloud.generate(str(text))
+                plt.figure(figsize=(24, 16))
+                plt.imshow(wordcloud)
+                plt.title(title, fontdict={'size': 40, 'verticalalignment': 'bottom'})
+                plt.axis('off')
+                plt.tight_layout()
+
+            # Combine all cleaned text
+            all_cleaned_text = ' '.join(df['Cleaned_Text'].apply(lambda x: ' '.join(x) if isinstance(x, list) else str(x)))
+
+            # Plot general word cloud
+            plot_word_cloud(all_cleaned_text, title="General Word Cloud")
+
             plot_word_cloud(df.loc[df['Predicted_Sentiment'] == -1]['Cleaned_Text'], title="Don't believe in climate change")
             plot_word_cloud(df.loc[df['Predicted_Sentiment'] == 0]['Cleaned_Text'], title="Neutral")
-            plot_word_cloud(df.loc[df['Predicted_Sentiment'] == 1]['Cleaned_Text'], title="Climate change believers")
-            st.pyplot()
+            plot_word_cloud(' '.join(df.loc[df['Predicted_Sentiment'] == 1]['Cleaned_Text']), title="Climate change believers")
+            st.pyplot(plt.gcf())
+            print(len(' '.join(df.loc[df['Predicted_Sentiment'] == -1]['Cleaned_Text'])))
 
     elif selected_option == "FAQs":
         # Display frequently asked questions
@@ -187,6 +195,66 @@ def main():
 
         # Add a text box for user input
         user_review = st.text_area("Enter your review here:", "")
+    
+    st.sidebar.title("Models")
+    selected_model = st.sidebar.selectbox("Select Models", ["Information", "Logistic Regression", "Linear SVC", "Nearest Neighbour"])
+
+    # Building out the "Information" page
+    if selected_model == "Information":
+        st.subheader("🚀 Welcome to the Sentiment Prediction Galaxy! 🌟")
+        # You can read a markdown file from supporting resources folder
+        st.markdown("Explore the vast universe of machine learning models designed to decode sentiments with precision. From starry-eyed classifiers to cosmic regressors, embark on a journey to unveil the secrets of sentiment analysis! 🌌✨")
+
+        #st.subheader("Raw Twitter data and label")
+        #if st.checkbox('Show raw data'): # data is hidden if box is unchecked
+            #st.write(raw[['sentiment', 'message']]) # will write the df to the page
+
+    # Building out the prediction page
+    elif selected_model == "Logistic Regression":
+        st.info("Prediction with ML Models")
+        # Creating a text box for user input
+        tweet_text = st.text_area("Enter Text", "Type Here")
+
+        if st.button("Classify"):
+            # Transforming user input with vectorizer
+            vect_text = tweet_cv.transform([tweet_text]).toarray()
+            # Load your .pkl file with the model of your choice + make predictions
+            # Try loading in multiple models to give the user a choice
+            predictor = joblib.load(open(os.path.join("resources/Logistic_regression.pkl"), "rb"))
+            prediction = predictor.predict(vect_text)
+
+            # When the model has successfully run, will print prediction
+            # You can use a dictionary or similar structure to make this output
+            # more human interpretable.
+            st.success("Text Categorized as: {}".format(prediction))
+
+    # Building out the prediction page
+    elif selected_model == "Linear SVC":
+        st.info("Prediction with ML Models")
+        # Creating a text box for user input
+        tweet_text = st.text_area("Enter Text", "Type Here")
+
+        if st.button("Classify"):
+            # Transforming user input with vectorizer
+            vect_text = tweet_processor.transform([tweet_text]).toarray()
+            # Load your .pkl file with the model of your choice + make predictions
+            # Try loading in multiple models to give the user a choice
+            predictor = joblib.load(open(os.path.join("resources/linear_svc_model.pkl"), "rb"))
+            prediction = predictor.predict(vect_text)
+
+            st.success("Text Categorized as: {}".format(prediction))
+
+    elif selected_model == "Nearest Neighbour":
+        st.info("Prediction with ML Models")
+        # Creating a text box for user input
+        tweet_text = st.text_area("Enter Text", "Type Here")
+
+        if st.button("Classify"):
+            # Transforming user input with vectorizer
+            vect_text = tweet_cv.transform([tweet_text]).toarray()
+            # Load your .pkl file with the model of your choice + make predictions
+            # Try loading in multiple models to give the user a choice
+            predictor = joblib.load(open(os.path.join("resources/best_model.pkl"), "rb"))
 
 if __name__ == "__main__":
     main()
