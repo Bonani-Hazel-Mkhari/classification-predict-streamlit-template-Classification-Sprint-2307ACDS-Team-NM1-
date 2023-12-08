@@ -33,6 +33,7 @@ from sklearn.metrics import accuracy_score, classification_report
 import joblib,os
 import joblib
 import re 
+import base64
 
 #modelling imports:
 from sklearn.model_selection import train_test_split
@@ -253,6 +254,46 @@ def main():
             # more human interpretable.
             st.success("Tweet categorized by {} model as: {}".format(option, output_text[str(prediction[0])]))
 
+# Function to convert image file to base64 encoding
+@st.cache_data
+def get_img_as_base64(file):
+    with open(file, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+# Get base64 encoding of an example image
+img = get_img_as_base64("image8.jpg")
+
+# Define background images and styles using HTML/CSS
+page_bg_img = f"""
+<style>
+[data-testid="stAppViewContainer"] > .main {{
+    background-image: url("https://images.pexels.com/photos/7130534/pexels-photo-7130534.jpeg");
+    background-size: 180%;
+    background-position: top left;
+    background-repeat: no-repeat;
+    background-attachment: local;
+}}
+
+[data-testid="stSidebar"] > div:first-child {{
+    background-image: url("data:image8/png;base64,{img}");
+    background-position: center; 
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}}
+
+[data-testid="stHeader"] {{
+background: rgba(0,0,0,0);
+}}
+
+[data-testid="stToolbar"] {{
+right: 2rem;
+}}
+</style>
+"""
+
+# Apply the background styles using Markdown in Streamlit
+st.markdown(page_bg_img, unsafe_allow_html=True)
 
 # Required to let Streamlit instantiate our web app.
 if __name__ == '__main__':
