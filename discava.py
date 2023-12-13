@@ -43,7 +43,6 @@ import re
 import base64
 import json
 import requests  
-from streamlit_lottie import st_lottie
 
 #modelling imports:
 from sklearn.model_selection import train_test_split
