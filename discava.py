@@ -31,7 +31,6 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.pipeline import Pipeline
 # Create the lemmatizer object
 lem = WordNetLemmatizer()
-from wordcloud import WordCloud
 from sklearn.feature_extraction.text import TfidfTransformer, CountVectorizer
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, classification_report
