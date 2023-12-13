@@ -22,7 +22,7 @@ https://docs.streamlit.io/en/latest/
 import streamlit as st 
 import pandas as pd
 import re
-from textblob import TextBlob
+#from textblob import TextBlob
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
