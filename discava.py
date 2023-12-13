@@ -25,7 +25,7 @@ import re
 from textblob import TextBlob
 import nltk
 nltk.download('stopwords')
-
+nltk.download('omw-1.4')
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
