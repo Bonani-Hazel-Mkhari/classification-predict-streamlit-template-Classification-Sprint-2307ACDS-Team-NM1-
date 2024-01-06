@@ -119,7 +119,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle
 
 #create the final Pipeline with pre-processing, weighing and modelling combined into a few lines of code.
 best_pipe = Pipeline([
-    ('vect',CountVectorizer(analyzer=preprocess_tweet)),  #tokenize the tweets
+    ('vect',TFidfVectorizer(analyzer=preprocess_tweet)),  #tokenize the tweets
     ('tfidf', TfidfTransformer()), #weight the classes
     ('classifier', LinearSVC()),
 ])
