@@ -35,6 +35,9 @@ from sklearn.pipeline import Pipeline
 # Create the lemmatizer object
 lem = WordNetLemmatizer()
 from sklearn.feature_extraction.text import TfidfTransformer, CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, classification_report
 import joblib,os
@@ -119,7 +122,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle
 
 #create the final Pipeline with pre-processing, weighing and modelling combined into a few lines of code.
 best_pipe = Pipeline([
-    ('vect',TFidfVectorizer(analyzer=preprocess_tweet)),  #tokenize the tweets
+    ('vect',TfidfVectorizer(analyzer=preprocess_tweet)),  #tokenize the tweets
     ('tfidf', TfidfTransformer()), #weight the classes
     ('classifier', LinearSVC()),
 ])
