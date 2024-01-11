@@ -35,6 +35,7 @@ from sklearn.pipeline import Pipeline
 # Create the lemmatizer object
 lem = WordNetLemmatizer()
 from sklearn.feature_extraction.text import TfidfTransformer, CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, classification_report
 import joblib,os
@@ -57,7 +58,7 @@ def get_img_as_base64(file):
     return base64.b64encode(data).decode()
 
 # Get base64 encoding of an example image
-img = get_img_as_base64("image8.jpg")
+img = get_img_as_base64("resources/image8.jpg")
 
 # Define background images and styles using HTML/CSS
 page_bg_img = f"""
