@@ -30,7 +30,7 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
 from nltk.stem import WordNetLemmatizer
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import Pipeline
 # Create the lemmatizer object
 lem = WordNetLemmatizer()
