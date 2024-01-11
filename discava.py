@@ -57,7 +57,7 @@ def get_img_as_base64(file):
     return base64.b64encode(data).decode()
 
 # Get base64 encoding of an example image
-img = get_img_as_base64("resources/image8.jpg")
+img = get_img_as_base64("image8.jpg")
 
 # Define background images and styles using HTML/CSS
 page_bg_img = f"""
