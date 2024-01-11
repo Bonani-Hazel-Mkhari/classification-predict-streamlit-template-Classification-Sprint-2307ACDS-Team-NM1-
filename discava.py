@@ -309,6 +309,7 @@ elif selected_tab == "Predictions 🚀":
             else:
                 print("Mismatch in the length of 'explode' and the number of sentiment categories")
    
+   
     # Single Sentiment
     st.subheader("Single Sentiment")
     st.markdown(" Enter you text >> Choose model >> Classify!!")
@@ -321,7 +322,7 @@ elif selected_tab == "Predictions 🚀":
     'Select a model to use',
     ['Linear SVC', 'Logistic Regression', 'Nearest Neighbors']
     )
-    if option == "Linear SVC":
+    if option == "Linear SVC" or " Logistic Regression" or " Nearest Neighbors":
         if st.button("Classify"):
             vect_text = tweet_cv.transform([tweet_text]).toarray()
             # Load your .pkl file with the model of your choice + make predictions
